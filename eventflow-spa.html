@@ -1,0 +1,823 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;EventFlow - Interactive Concept&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Chosen Palette: Warm Neutrals --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Application Structure Plan: A dashboard-centric, single-page application. The primary structure is a top navigation bar to switch between three main views: 'Dashboard', 'Calendar', and 'Tasks'. This design was chosen for its intuitive and proven user flow in productivity apps. It allows users to get a high-level overview (Dashboard), dive into a time-based schedule (Calendar), or focus on a list-based workflow (Tasks), directly addressing the core goals of the PRD. Modals are used for focused actions like adding tasks or viewing event details, preventing context switching and keeping the interface clean. This structure best synthesizes the PRD's features into a cohesive and explorable user experience. Integration placeholders are added to demonstrate where external service connections would be managed and how their data would conceptually appear. New: Multiple task lists are introduced, allowing users to organize tasks by project or event. A list selector and creation option are added to the 'Tasks' view, enhancing organization and user control. --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Visualization &amp; Content Choices:<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>- Report Info: Success Metrics (Task Completion, Priority) -&gt; Goal: Inform/Compare -&gt; Viz: Donut &amp; Bar Charts (Chart.js) -&gt; Interaction: Hover tooltips -&gt; Justification: Provides a quick, visual summary of productivity, a key goal.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>- Report Info: Event Schedule -&gt; Goal: Organize -&gt; Viz: Simulated Monthly Calendar Grid (HTML/CSS Grid) -&gt; Interaction: Click on event to open details modal -&gt; Justification: Visually represents the core task-event relationship without the complexity of a full calendar library, adhering to constraints.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>- Report Info: Task Lists &amp; Filtering -&gt; Goal: Organize/Inform -&gt; Viz: Interactive List/Table (HTML/Tailwind) -&gt; Interaction: Filter buttons update the list via JS -&gt; Justification: Provides a clear, functional way to manage and sort through tasks as described in the PRD.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>- Report Info: Task-Event Linking -&gt; Goal: Relationships -&gt; Viz: Button in event modal to "Link Task" -&gt; Interaction: Opens a task selection list -&gt; Justification: A simplified but clear interaction to demonstrate the key feature of associating tasks with events.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>- New: Integration Section -&gt; Goal: Demonstrate expandability -&gt; Viz: Buttons/Text -&gt; Interaction: Click to show conceptual integration steps -&gt; Justification: Addresses user query by showing where external services would connect.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>- New: Multiple Task Lists -&gt; Goal: Organize/Filter -&gt; Viz: Dropdown for list selection, "Create List" button (HTML/Tailwind) -&gt; Interaction: Selecting a list filters tasks, creating a list adds it to state -&gt; Justification: Directly addresses user request for better task organization.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f8fafc; /* slate-50 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.chart-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-left: auto;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>margin-right: auto;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 300px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-height: 350px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@media (min-width: 768px) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.chart-container {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>height: 320px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.calendar-grid {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(7, minmax(0, 1fr));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>gap: 1px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.calendar-day {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>min-height: 120px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.modal-backdrop {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: opacity 0.3s ease;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.modal-content {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.3s ease;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="text-slate-800"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="app" class="min-h-screen"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Header &amp; Navigation --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex items-center justify-between h-16"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="text-2xl font-bold text-slate-800"&gt;EventFlow&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;nav class="hidden md:flex items-center space-x-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button data-view="dashboard" class="nav-link bg-slate-200 text-slate-900 font-semibold py-2 px-4 rounded-lg shadow-sm"&gt;Dashboard&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button data-view="calendar" class="nav-link text-slate-600 hover:bg-slate-100 font-semibold py-2 px-4 rounded-lg"&gt;Calendar&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button data-view="tasks" class="nav-link text-slate-600 hover:bg-slate-100 font-semibold py-2 px-4 rounded-lg"&gt;Tasks&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button data-view="integrations" class="nav-link text-slate-600 hover:bg-slate-100 font-semibold py-2 px-4 rounded-lg"&gt;Integrations&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/nav&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>&lt;button id="addTaskBtnHeader" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="mr-2 text-xl"&gt;+&lt;/span&gt; New Task</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Mobile Navigation --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 p-2 flex justify-around"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="dashboard" class="nav-link mobile-nav-link flex-1 flex flex-col items-center p-2 rounded-lg bg-slate-100"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="text-2xl"&gt;📊&lt;/span&gt;&lt;span class="text-xs font-semibold"&gt;Dashboard&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="calendar" class="nav-link mobile-nav-link flex-1 flex flex-col items-center p-2 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="text-2xl"&gt;🗓️&lt;/span&gt;&lt;span class="text-xs font-semibold"&gt;Calendar&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="tasks" class="nav-link mobile-nav-link flex-1 flex flex-col items-center p-2 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="text-2xl"&gt;📋&lt;/span&gt;&lt;span class="text-xs font-semibold"&gt;Tasks&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="integrations" class="nav-link mobile-nav-link flex-1 flex flex-col items-center p-2 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="text-2xl"&gt;🔌&lt;/span&gt;&lt;span class="text-xs font-semibold"&gt;Integrations&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Main Content --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;main id="main-content" class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto pb-24 md:pb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Content will be injected here by JavaScript --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/main&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Modal Structure --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="modal-container" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-backdrop opacity-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="modal-content" class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform scale-95"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Modal content will be injected here --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('DOMContentLoaded', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const appState = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentView: 'dashboard',</p>
+<p class="p1"><span class="Apple-converted-space">                </span>taskLists: [</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'all', name: 'All Tasks', type: 'system', associatedEventId: null }, // System generated 'All Tasks' list</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'default', name: 'My General Tasks', type: 'general', associatedEventId: null },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'project-alpha', name: 'Project Alpha Tasks', type: 'project', associatedEventId: 1 },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'exam-prep', name: 'History Exam Prep', type: 'event', associatedEventId: 2 },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 'party-planning', name: 'Sarah\'s Party', type: 'event', associatedEventId: 3 }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentTaskListId: 'all', // Default to 'All Tasks'</p>
+<p class="p1"><span class="Apple-converted-space">                </span>tasks: [</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 1, title: "Finalize Q3 report slides", description: "Review data and create final presentation slides.", priority: 'high', status: 'in-progress', dueDate: '2025-07-28', eventId: 1, source: 'EventFlow', listId: 'project-alpha' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 2, title: "Draft project proposal", description: "Outline goals, timeline, and budget for the new initiative.", priority: 'medium', status: 'to-do', dueDate: '2025-07-29', eventId: 1, source: 'EventFlow', listId: 'project-alpha' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 3, title: "Buy decorations and cake", description: "Get balloons, banners, and a chocolate cake.", priority: 'high', status: 'to-do', dueDate: '2025-08-01', eventId: 3, source: 'EventFlow', listId: 'party-planning' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 4, title: "Send out thank you notes", description: "Write and send notes to all attendees.", priority: 'low', status: 'to-do', dueDate: '2025-08-04', eventId: 3, source: 'EventFlow', listId: 'party-planning' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 5, title: "Review study guide chapters 5-7", description: "Focus on key concepts and definitions.", priority: 'high', status: 'completed', dueDate: '2025-07-26', eventId: 2, source: 'EventFlow', listId: 'exam-prep' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 6, title: "Complete practice exam", description: "Time myself to simulate real exam conditions.", priority: 'medium', status: 'in-progress', dueDate: '2025-07-30', eventId: 2, source: 'EventFlow', listId: 'exam-prep' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 7, title: "Book flight to NYC", description: "", priority: 'high', status: 'completed', dueDate: '2025-07-25', eventId: null, source: 'EventFlow', listId: 'default' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 8, title: "Weekly grocery shopping", description: "Milk, eggs, bread, vegetables.", priority: 'low', status: 'to-do', dueDate: '2025-07-27', eventId: null, source: 'EventFlow', listId: 'default' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Placeholder for tasks from Google Keep</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 9, title: "Check car oil (from Keep)", description: "Reminder from Google Keep.", priority: 'low', status: 'to-do', dueDate: '2025-08-05', eventId: null, source: 'Google Keep', listId: 'default' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 10, title: "Call plumber (from Keep)", description: "Note from Google Keep.", priority: 'medium', status: 'completed', dueDate: '2025-07-20', eventId: null, source: 'Google Keep', listId: 'default' },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                </span>events: [</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 1, title: "Project Alpha Kick-off", date: '2025-07-29', time: '10:00 AM', color: 'blue', source: 'EventFlow' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 2, title: "Final Exam: History 101", date: '2025-07-31', time: '2:00 PM', color: 'red', source: 'EventFlow' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 3, title: "Sarah's Birthday Party", date: '2025-08-02', time: '7:00 PM', color: 'purple', source: 'EventFlow' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 4, title: "Dentist Appointment", date: '2025-08-12', time: '11:00 AM', color: 'green', source: 'EventFlow' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Placeholder for events from Google Calendar</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 5, title: "Team Sync (Google Calendar)", date: '2025-07-29', time: '9:00 AM', color: 'indigo', source: 'Google Calendar' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{ id: 6, title: "Yoga Class (Google Calendar)", date: '2025-08-01', time: '6:00 PM', color: 'pink', source: 'Google Calendar' },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>],</p>
+<p class="p1"><span class="Apple-converted-space">                </span>integratedServices: {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>googleCalendar: { connected: false, status: 'Not Connected' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>googleKeep: { connected: false, status: 'Not Connected' },</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>gmail: { connected: false, status: 'Not Connected' }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                </span>currentTaskFilter: 'all'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const mainContent = document.getElementById('main-content');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const navLinks = document.querySelectorAll('.nav-link');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const modalContainer = document.getElementById('modal-container');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const modalContent = document.getElementById('modal-content');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let taskCompletionChart = null;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let taskPriorityChart = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function getPriorityClass(priority) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>switch (priority) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'high': return 'bg-red-100 text-red-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'medium': return 'bg-yellow-100 text-yellow-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'low': return 'bg-blue-100 text-blue-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>default: return 'bg-slate-100 text-slate-800';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function getStatusClass(status) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>switch (status) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'completed': return 'bg-green-100 text-green-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'in-progress': return 'bg-indigo-100 text-indigo-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>case 'to-do': return 'bg-slate-100 text-slate-800';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>default: return 'bg-slate-100 text-slate-800';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderDashboard() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const completedTasks = appState.tasks.filter(t =&gt; t.status === 'completed').length;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const totalTasks = appState.tasks.length;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const overdueTasks = appState.tasks.filter(t =&gt; new Date(t.dueDate) &lt; new Date() &amp;&amp; t.status !== 'completed');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const upcomingEvents = appState.events.filter(e =&gt; new Date(e.date) &gt;= new Date()).slice(0, 3);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>mainContent.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="space-y-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h1 class="text-3xl font-bold text-slate-900"&gt;Dashboard&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-slate-500 mt-1"&gt;Here's a summary of your events and tasks.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="grid grid-cols-1 lg:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Left Column: Key Metrics &amp; Upcoming --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="lg:col-span-2 space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;!-- Key Metrics --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="grid grid-cols-1 sm:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;h3 class="font-semibold text-slate-500"&gt;Total Tasks&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;p class="text-4xl font-bold mt-2"&gt;${totalTasks}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;h3 class="font-semibold text-slate-500"&gt;Tasks Completed&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;p class="text-4xl font-bold mt-2"&gt;${completedTasks}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;h3 class="font-semibold text-slate-500"&gt;Overdue&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;p class="text-4xl font-bold mt-2 text-red-500"&gt;${overdueTasks.length}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;!-- Upcoming Events --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h3 class="text-xl font-bold mb-4"&gt;Upcoming Events&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>${upcomingEvents.length &gt; 0 ? upcomingEvents.map(event =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div class="flex items-center space-x-4 p-3 rounded-lg hover:bg-slate-50 cursor-pointer" onclick="showEventDetails(${event.id})"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="w-12 h-12 bg-${event.color}-100 rounded-lg flex flex-col items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="text-xs font-bold text-${event.color}-700"&gt;${new Date(event.date).toLocaleString('en-us', { month: 'short' })}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="text-xl font-bold text-${event.color}-800"&gt;${new Date(event.date).getDate()}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;p class="font-semibold"&gt;${event.title}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;p class="text-sm text-slate-500"&gt;${new Date(event.date).toLocaleDateString('en-US', { weekday: 'long' })} at ${event.time}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>${event.source !== 'EventFlow' ? `&lt;span class="text-xs font-medium rounded-full bg-gray-100 text-gray-800 px-2 py-0.5 mt-1 block"&gt;Source: ${event.source}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>`).join('') : '&lt;p class="text-slate-500"&gt;No upcoming events.&lt;/p&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Right Column: Charts --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h3 class="text-xl font-bold mb-4 text-center"&gt;Task Completion&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="chart-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;canvas id="taskCompletionChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;h3 class="text-xl font-bold mb-4 text-center"&gt;Tasks by Priority&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div class="chart-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;canvas id="taskPriorityChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderDashboardCharts();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderDashboardCharts() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const completionCtx = document.getElementById('taskCompletionChart')?.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (completionCtx) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if(taskCompletionChart) taskCompletionChart.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const completed = appState.tasks.filter(t =&gt; t.status === 'completed').length;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const pending = appState.tasks.length - completed;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>taskCompletionChart = new Chart(completionCtx, {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type: 'doughnut',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>labels: ['Completed', 'Pending'],</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>data: [completed, pending],</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: ['#22c55e' /* green-500 */, '#e2e8f0' /* slate-200 */],</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderColor: '#ffffff',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderWidth: 4,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>options: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>cutout: '70%',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>plugins: { legend: { display: true, position: 'bottom' } }</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const priorityCtx = document.getElementById('taskPriorityChart')?.getContext('2d');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (priorityCtx) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if(taskPriorityChart) taskPriorityChart.destroy();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const high = appState.tasks.filter(t =&gt; t.priority === 'high').length;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const medium = appState.tasks.filter(t =&gt; t.priority === 'medium').length;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const low = appState.tasks.filter(t =&gt; t.priority === 'low').length;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>taskPriorityChart = new Chart(priorityCtx, {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type: 'bar',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>data: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>labels: ['High', 'Medium', 'Low'],</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>label: 'Task Count',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>data: [high, medium, low],</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>backgroundColor: ['#ef4444' /* red-500 */, '#f59e0b' /* amber-500 */, '#3b82f6' /* blue-500 */],</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>borderRadius: 4</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>options: {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>plugins: { legend: { display: false } },</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderCalendar() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const today = new Date();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const month = today.getMonth();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const year = today.getFullYear();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const firstDayOfMonth = new Date(year, month, 1);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const daysInMonth = new Date(year, month + 1, 0).getDate();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const startingDay = firstDayOfMonth.getDay();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>let calendarDaysHtml = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let i = 0; i &lt; startingDay; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>calendarDaysHtml += `&lt;div class="bg-slate-50 rounded-lg"&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>for (let day = 1; day &lt;= daysInMonth; day++) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const currentDate = new Date(year, month, day);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const dateStr = currentDate.toISOString().split('T')[0];</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Combine EventFlow events with placeholder Google Calendar events</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const eventsOnDay = appState.events.filter(e =&gt; e.date === dateStr);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const isToday = day === today.getDate() &amp;&amp; month === today.getMonth() &amp;&amp; year === today.getFullYear();</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>calendarDaysHtml += `</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="calendar-day bg-white border border-slate-200 rounded-lg p-2 flex flex-col"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="font-bold text-sm ${isToday ? 'bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}"&gt;${day}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex-grow mt-1 space-y-1 overflow-y-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${eventsOnDay.map(event =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div onclick="showEventDetails(${event.id})" class="text-xs p-1 rounded bg-${event.color}-100 text-${event.color}-800 font-semibold truncate cursor-pointer hover:ring-2 ring-${event.color}-400"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>${event.title} ${event.source !== 'EventFlow' ? `(${event.source.split(' ')[1]})` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`).join('')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>mainContent.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-center mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h1 class="text-3xl font-bold text-slate-900"&gt;${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-500 mt-1"&gt;Click on an event to see its details and linked tasks.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="calendar-grid border-t border-l border-slate-200 bg-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Sun&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Mon&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Tue&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Wed&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Thu&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Fri&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-center font-semibold p-2 bg-white"&gt;Sat&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${calendarDaysHtml}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderTasks() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const currentList = appState.taskLists.find(list =&gt; list.id === appState.currentTaskListId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const filteredTasks = appState.tasks.filter(task =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (appState.currentTaskListId === 'all') {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return true; // Show all tasks for "All Tasks" list</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return task.listId === appState.currentTaskListId;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>mainContent.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h1 class="text-3xl font-bold text-slate-900"&gt;Task List: ${currentList ? currentList.name : 'Unknown List'}&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-500 mt-1"&gt;Manage your tasks, organized by project or event.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;select id="taskListSelector" class="px-4 py-1.5 rounded-md font-semibold text-sm bg-slate-100 border border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${appState.taskLists.map(list =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;option value="${list.id}" ${list.id === appState.currentTaskListId ? 'selected' : ''}&gt;${list.name}&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>`).join('')}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button id="createTaskListBtn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-1.5 px-4 rounded-lg shadow-sm text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>New List</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="task-filter-btn ${appState.currentTaskFilter === 'all' ? 'bg-white shadow' : ''} px-4 py-1.5 rounded-md font-semibold text-sm" data-filter="all"&gt;All&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="task-filter-btn ${appState.currentTaskFilter === 'high' ? 'bg-white shadow' : ''} px-4 py-1.5 rounded-md font-semibold text-sm" data-filter="high"&gt;High&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="task-filter-btn ${appState.currentTaskFilter === 'medium' ? 'bg-white shadow' : ''} px-4 py-1.5 rounded-md font-semibold text-sm" data-filter="medium"&gt;Medium&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;button class="task-filter-btn ${appState.currentTaskFilter === 'low' ? 'bg-white shadow' : ''} px-4 py-1.5 rounded-md font-semibold text-sm" data-filter="low"&gt;Low&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="bg-white rounded-xl shadow-sm border border-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;ul id="task-list-ul" class="divide-y divide-slate-200"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${filteredTasks.length &gt; 0 ? filteredTasks.map(task =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li class="p-4 flex items-center justify-between hover:bg-slate-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div class="flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;input type="checkbox" ${task.status === 'completed' ? 'checked' : ''} class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-4" onchange="toggleTaskStatus(${task.id}, this.checked)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;p class="font-semibold ${task.status === 'completed' ? 'line-through text-slate-500' : ''}"&gt;${task.title}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;div class="flex items-center space-x-2 text-sm text-slate-500 mt-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span&gt;Due: ${new Date(task.dueDate).toLocaleDateString()}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="text-slate-300"&gt;|&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full ${getPriorityClass(task.priority)}"&gt;${task.priority}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full ${getStatusClass(task.status)}"&gt;${task.status}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>${task.eventId ? `&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800"&gt;🔗 ${appState.events.find(e =&gt; e.id === task.eventId)?.title}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>${task.source !== 'EventFlow' ? `&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800"&gt;Source: ${task.source}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                                    </span>&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-800"&gt;List: ${appState.taskLists.find(l =&gt; l.id === task.listId)?.name || 'N/A'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;button class="text-slate-400 hover:text-slate-600" onclick="showTaskDetails(${task.id})"&gt;Details&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`).join('') : '&lt;li class="p-6 text-center text-slate-500"&gt;No tasks match the current filter in this list.&lt;/li&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>addFilterEventListeners();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('taskListSelector').addEventListener('change', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>switchTaskList(e.target.value);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createTaskListBtn').addEventListener('click', showCreateTaskListModal);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function addFilterEventListeners() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('.task-filter-btn').forEach(button =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>button.addEventListener('click', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>appState.currentTaskFilter = e.target.dataset.filter;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderTasks();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.toggleTaskStatus = (taskId, isChecked) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const task = appState.tasks.find(t =&gt; t.id === taskId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (task) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>task.status = isChecked ? 'completed' : 'to-do';</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (appState.currentView === 'tasks') {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderTasks();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else if (appState.currentView === 'dashboard') {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderDashboard();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function showModal(content) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modalContent.innerHTML = content;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modalContainer.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>modalContainer.classList.remove('opacity-0');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>modalContent.classList.remove('scale-95');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 10);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function hideModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modalContainer.classList.add('opacity-0');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>modalContent.classList.add('scale-95');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>modalContainer.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>modalContent.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 300);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.showEventDetails = (eventId) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const event = appState.events.find(e =&gt; e.id === eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!event) return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const linkedTasks = appState.tasks.filter(t =&gt; t.eventId === eventId);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const content = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h2 class="text-2xl font-bold"&gt;${event.title}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-500"&gt;${new Date(event.date).toDateString()} at ${event.time}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${event.source !== 'EventFlow' ? `&lt;p class="text-sm text-slate-500 mt-1"&gt;Source: ${event.source}&lt;/p&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="hideModal()" class="text-slate-400 hover:text-slate-600"&gt;&amp;times;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="mt-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 class="font-semibold mb-2"&gt;Linked Tasks&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;ul class="space-y-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${linkedTasks.length &gt; 0 ? linkedTasks.map(task =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li class="p-3 bg-slate-50 rounded-lg flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;input type="checkbox" ${task.status === 'completed' ? 'checked' : ''} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-3" onchange="toggleTaskStatus(${task.id}, this.checked)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;span class="${task.status === 'completed' ? 'line-through text-slate-500' : ''}"&gt;${task.title}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>${task.source !== 'EventFlow' ? `&lt;span class="text-xs font-medium rounded-full bg-gray-100 text-gray-800 px-2 py-0.5 ml-2"&gt;Source: ${task.source}&lt;/span&gt;` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;span class="text-xs font-medium rounded-full bg-slate-100 text-slate-800 px-2 py-0.5 ml-2"&gt;List: ${appState.taskLists.find(l =&gt; l.id === task.listId)?.name || 'N/A'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`).join('') : '&lt;li class="text-slate-500 text-sm"&gt;No tasks linked to this event.&lt;/li&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="mt-6 flex justify-end"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="hideModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg"&gt;Close&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showModal(content);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.showTaskDetails = (taskId) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const task = appState.tasks.find(t =&gt; t.id === taskId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!task) return;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const linkedEvent = appState.events.find(e =&gt; e.id === task.eventId);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const taskList = appState.taskLists.find(l =&gt; l.id === task.listId);</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const content = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h2 class="text-2xl font-bold"&gt;${task.title}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="hideModal()" class="text-slate-400 hover:text-slate-600"&gt;&amp;times;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-slate-600 mt-2"&gt;${task.description || 'No description provided.'}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="mt-4 grid grid-cols-2 gap-4 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Due Date&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-600"&gt;${new Date(task.dueDate).toLocaleDateString()}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Priority&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full ${getPriorityClass(task.priority)}"&gt;${task.priority}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                             </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Status&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="px-2 py-0.5 text-xs font-medium rounded-full ${getStatusClass(task.status)}"&gt;${task.status}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                             </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Linked Event&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-600"&gt;${linkedEvent ? linkedEvent.title : 'None'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Source&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-600"&gt;${task.source}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-slate-50 p-3 rounded-lg"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-semibold block"&gt;Task List&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-slate-600"&gt;${taskList ? taskList.name : 'N/A'}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="mt-6 flex justify-end"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="hideModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg"&gt;Close&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showModal(content);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function showAddTaskModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const content = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;form id="addTaskForm" class="p-6 space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h2 class="text-2xl font-bold"&gt;Add New Task&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="button" onclick="hideModal()" class="text-slate-400 hover:text-slate-600"&gt;&amp;times;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="title" class="block text-sm font-medium text-slate-700"&gt;Title&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="text" id="title" name="title" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="dueDate" class="block text-sm font-medium text-slate-700"&gt;Due Date&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="date" id="dueDate" name="dueDate" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="priority" class="block text-sm font-medium text-slate-700"&gt;Priority&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="priority" name="priority" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="low"&gt;Low&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="medium" selected&gt;Medium&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="high"&gt;High&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="taskList" class="block text-sm font-medium text-slate-700"&gt;Add to List&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="taskList" name="taskList" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${appState.taskLists.filter(list =&gt; list.type !== 'system').map(list =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;option value="${list.id}" ${list.id === appState.currentTaskListId &amp;&amp; list.id !== 'all' ? 'selected' : ''}&gt;${list.name}&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>`).join('')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-end pt-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="button" onclick="hideModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg mr-2"&gt;Cancel&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"&gt;Add Task&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showModal(content);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('addTaskForm').addEventListener('submit', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const title = e.target.elements.title.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const dueDate = e.target.elements.dueDate.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const priority = e.target.elements.priority.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const listId = e.target.elements.taskList.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const newTask = {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>id: Date.now(),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>title,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>description: '',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>priority,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>status: 'to-do',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>dueDate,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>eventId: null,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>source: 'EventFlow',</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>listId: listId</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>appState.tasks.push(newTask);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>hideModal();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderView(appState.currentView);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function switchTaskList(listId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>appState.currentTaskListId = listId;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderTasks();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function showCreateTaskListModal() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const content = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;form id="createTaskListForm" class="p-6 space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h2 class="text-2xl font-bold"&gt;Create New Task List&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="button" onclick="hideModal()" class="text-slate-400 hover:text-slate-600"&gt;&amp;times;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="listName" class="block text-sm font-medium text-slate-700"&gt;List Name&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="text" id="listName" name="listName" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="listType" class="block text-sm font-medium text-slate-700"&gt;List Type&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="listType" name="listType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="general"&gt;General&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="project"&gt;Project&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value="event"&gt;Event&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="associatedEventField" class="hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;label for="associatedEvent" class="block text-sm font-medium text-slate-700"&gt;Associate with Event&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;select id="associatedEvent" name="associatedEvent" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-slate-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;option value=""&gt;None&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>${appState.events.map(event =&gt; `&lt;option value="${event.id}"&gt;${event.title}&lt;/option&gt;`).join('')}</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-end pt-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="button" onclick="hideModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-4 rounded-lg mr-2"&gt;Cancel&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"&gt;Create List&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showModal(content);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const listTypeSelect = document.getElementById('listType');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const associatedEventField = document.getElementById('associatedEventField');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>listTypeSelect.addEventListener('change', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (e.target.value === 'event') {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>associatedEventField.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>associatedEventField.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.getElementById('createTaskListForm').addEventListener('submit', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const listName = e.target.elements.listName.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const listType = e.target.elements.listType.value;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const associatedEventId = listType === 'event' ? e.target.elements.associatedEvent.value : null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const newTaskList = {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>id: `list-${Date.now()}`,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>name: listName,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>type: listType,</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>associatedEventId: associatedEventId ? parseInt(associatedEventId) : null</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>appState.taskLists.push(newTaskList);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>hideModal();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>switchTaskList(newTaskList.id); // Switch to the newly created list</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderIntegrations() {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>mainContent.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="space-y-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h1 class="text-3xl font-bold text-slate-900"&gt;Integrations&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-slate-500 mt-1"&gt;Connect EventFlow with your favorite services to centralize your tasks and events.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Google Calendar Integration --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-5xl mb-4"&gt;🗓️&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 class="text-xl font-bold mb-2"&gt;Google Calendar&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-600 mb-4"&gt;Sync your events from Google Calendar to see all your commitments in one place.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button onclick="connectGoogleService('googleCalendar')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${appState.integratedServices.googleCalendar.connected ? 'Connected' : 'Connect'}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-sm text-slate-500 mt-2"&gt;Status: ${appState.integratedServices.googleCalendar.status}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Google Keep Integration --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-5xl mb-4"&gt;📝&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 class="text-xl font-bold mb-2"&gt;Google Keep&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-600 mb-4"&gt;Import your notes and checklists from Google Keep as tasks.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button onclick="connectGoogleService('googleKeep')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${appState.integratedServices.googleKeep.connected ? 'Connected' : 'Connect'}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-sm text-slate-500 mt-2"&gt;Status: ${appState.integratedServices.googleKeep.status}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;!-- Gmail Integration --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-5xl mb-4"&gt;📧&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 class="text-xl font-bold mb-2"&gt;Gmail&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-slate-600 mb-4"&gt;Extract tasks directly from your emails and add them to EventFlow.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;button onclick="connectGoogleService('gmail')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>${appState.integratedServices.gmail.connected ? 'Connected' : 'Connect'}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-sm text-slate-500 mt-2"&gt;Status: ${appState.integratedServices.gmail.status}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg mt-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 class="font-bold text-lg mb-2"&gt;Important Note on Integrations&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;p class="text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>Full integration with services like Google Calendar, Google Keep, and Gmail requires robust backend infrastructure for secure OAuth 2.0 authentication and API key management. This single-page HTML application</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>currently provides only a conceptual representation of where these integrations would reside.</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;br&gt;&lt;br&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>In a real-world application, connecting these services would involve:</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;ul class="list-disc list-inside mt-2 space-y-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li&gt;Redirecting users to Google's authentication servers.&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li&gt;Handling authorization codes and exchanging them for access tokens on a secure backend.&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li&gt;Making API calls to Google's services from the backend to fetch or push data.&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li&gt;Securely storing refresh tokens to maintain long-term access without re-authentication.&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;li&gt;Implementing robust error handling and data synchronization logic.&lt;/li&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/ul&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>This conceptual interface allows you to see *how* EventFlow would present these options, but the actual complex integration logic is beyond the scope of a purely client-side HTML file.</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.connectGoogleService = (serviceName) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// This is a placeholder function to demonstrate the interaction.</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// In a real application, this would initiate the OAuth flow.</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const service = appState.integratedServices[serviceName];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (service) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (!service.connected) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>service.connected = true;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>service.status = 'Connecting... (requires backend)';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Simulate a delay for connection attempt</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>service.status = 'Connected (conceptual)';</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>renderIntegrations(); // Re-render to update status</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// In a real app, successful connection would trigger data sync</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// For demonstration, we've already added placeholder data in appState.tasks and appState.events</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}, 1500);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>service.connected = false;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>service.status = 'Disconnected';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderIntegrations(); // Re-render to update status</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function switchView(view) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>appState.currentView = view;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>navLinks.forEach(link =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (link.dataset.view === view) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.add('bg-slate-200', 'text-slate-900', 'shadow-sm');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.remove('text-slate-600', 'hover:bg-slate-100');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.remove('bg-slate-200', 'text-slate-900', 'shadow-sm');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.add('text-slate-600', 'hover:bg-slate-100');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Update mobile nav links separately as they have different styling</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('.mobile-nav-link').forEach(link =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                     </span>if (link.dataset.view === view) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.add('bg-slate-100');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>link.classList.remove('bg-slate-100');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderView(view);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>function renderView(view) {</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>if (view === 'dashboard') renderDashboard();</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>else if (view === 'calendar') renderCalendar();</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>else if (view === 'tasks') renderTasks();</p>
+<p class="p1"><span class="Apple-converted-space">                 </span>else if (view === 'integrations') renderIntegrations();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>navLinks.forEach(link =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>link.addEventListener('click', () =&gt; switchView(link.dataset.view));</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>modalContainer.addEventListener('click', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (e.target === modalContainer) hideModal();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('addTaskBtnHeader').addEventListener('click', showAddTaskModal);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Initial Render</p>
+<p class="p1"><span class="Apple-converted-space">            </span>switchView('dashboard');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
